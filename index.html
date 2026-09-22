@@ -153,7 +153,8 @@
     //  CONFIGURACIÓN — cambia esto por tus datos
     // ============================================
     const API_URL = 'https://blacklst.waevohosting.es/api/v1/check';
-    const API_KEY = 'BLWHtvxopo9RKUc0K1dqtCiLrSkpUEmKKpj3EIGvK8v1WArquZZfh5UouJEvQ';
+    const API_KEY = 'BLWHbAhGPTHlMZu31Gnn7TFlJk7F1Wg9wS2BpGOoYGtLHSx3Fk3IuBuVkEoAC';
+    const CLIENT_ID = 'CLID72rb8o02jftv9onmyg1ahxbwskv7';
 
     // ============================================
     //  Helpers UI
@@ -193,6 +194,7 @@
           headers: {
             'Content-Type': 'application/json',
             'x-api-key': API_KEY,
+            'x-client-id': CLIENT_ID,
           },
           body: JSON.stringify({ email }),
         });
@@ -208,12 +210,21 @@
           };
         }
 
-        // 401 → API key inválida / revocada
+        // 402 → almacenamiento agotado / key pausada
+        if (res.status === 402) {
+          return {
+            ok: false,
+            blocked: false,
+            message: data.error || 'API key pausada por límite de almacenamiento.',
+          };
+        }
+
+        // 401 → API key o Client ID inválidos / revocados
         if (res.status === 401) {
           return {
             ok: false,
             blocked: false,
-            message: 'Error de configuración: API key inválida o revocada.',
+            message: 'Error de configuración: API Key o Client ID inválidos.',
           };
         }
 
